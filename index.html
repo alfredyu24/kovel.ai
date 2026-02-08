@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kovel.ai — We're Cooking Agent</title>
-  <meta name="description" content="Kovel.ai is building the next generation of AI agents. Join the waitlist.">
+  <title>Kovel.ai — Turn Your Idea Into Reality</title>
+  <meta name="description" content="Kovel.ai delivers professional AI agents that run your business operations — so you can focus on what matters most: your ideas.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -97,12 +97,19 @@
     .page {
       position: relative;
       z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .page-hero {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      width: 100%;
     }
 
     /* ─── Nav ─── */
@@ -450,13 +457,146 @@
       color: var(--text);
     }
 
+    /* ─── Pain points section ─── */
+    .pain-section {
+      width: 100%;
+      max-width: 900px;
+      padding: 6rem 2rem 4rem;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    .pain-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pain-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .pain-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--ember);
+      margin-bottom: 1rem;
+    }
+
+    .pain-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .pain-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .pain-card:hover {
+      border-color: rgba(239, 68, 68, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .pain-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: block;
+      width: 44px;
+      height: 44px;
+      line-height: 44px;
+      text-align: center;
+      background: rgba(239, 68, 68, 0.08);
+      border-radius: 12px;
+    }
+
+    .pain-card h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    .pain-card p {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-dim);
+    }
+
+    /* ─── Transition / vision section ─── */
+    .vision-section {
+      width: 100%;
+      max-width: 660px;
+      text-align: center;
+      padding: 4rem 2rem 6rem;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease-out 0.15s, transform 0.8s ease-out 0.15s;
+    }
+
+    .vision-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .vision-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin: 0 auto 2rem;
+      border-radius: 2px;
+    }
+
+    .vision-text {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 400;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .vision-text span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .pain-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .pain-section { padding: 4rem 0 3rem; }
+      .vision-section { padding: 3rem 0 5rem; }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      .pain-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     /* ─── Footer ─── */
     .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      position: relative;
       z-index: 10;
+      width: 100%;
       padding: 1rem 2rem;
       display: flex;
       align-items: center;
@@ -559,6 +699,7 @@
 
   <!-- Main -->
   <main class="page">
+    <div class="page-hero">
     <div class="hero">
 
       <!-- Cauldron illustration -->
@@ -583,11 +724,11 @@
       <p class="hero-label">AI Agent for Business</p>
 
       <h1 class="hero-title">
-        We're cooking<br><em>agent</em>
+        Turn your idea<br>into <em>reality</em>
       </h1>
 
       <p class="hero-sub">
-        Something powerful is brewing. Kovel.ai is building AI agents that transform the way businesses operate. Be the first to know.
+        Professional AI agents that deliver real business results. Stop worrying about execution and scaling — focus on your vision, and let Kovel handle the rest.
       </p>
 
       <!-- Waitlist -->
@@ -609,14 +750,48 @@
 
       <!-- Tags -->
       <div class="tags">
-        <span class="tag">Autonomous</span>
-        <span class="tag">Multi-Agent</span>
-        <span class="tag">Tool Use</span>
-        <span class="tag">Reasoning</span>
-        <span class="tag">Memory</span>
+        <span class="tag">Operational Efficiency</span>
+        <span class="tag">Effortless Scaling</span>
+        <span class="tag">Idea to Execution</span>
+        <span class="tag">Focus on Your Business</span>
       </div>
 
     </div>
+    </div><!-- /page-hero -->
+
+    <!-- Pain points -->
+    <section class="pain-section" id="painSection">
+      <div class="pain-header">
+        <p class="pain-label">The reality of scaling a business</p>
+        <h2 class="pain-title">Great ideas die in execution</h2>
+      </div>
+      <div class="pain-grid">
+        <div class="pain-card">
+          <span class="pain-icon">&#x26A0;</span>
+          <h3>Operational Bottlenecks</h3>
+          <p>Repetitive manual processes drain your team's time. As work piles up, things slip through the cracks and quality drops — your best people spend days on tasks that should take minutes.</p>
+        </div>
+        <div class="pain-card">
+          <span class="pain-icon">&#x23F3;</span>
+          <h3>Execution Gaps</h3>
+          <p>You have the strategy, but turning plans into action is painfully slow. Coordination overhead, context switching, and unclear handoffs mean great ideas sit in backlogs for months.</p>
+        </div>
+        <div class="pain-card">
+          <span class="pain-icon">&#x1F4C8;</span>
+          <h3>Scaling Pain</h3>
+          <p>Growing the team doesn't scale the output. More people means more meetings, more alignment overhead, and more complexity — the org slows down right when it needs to speed up.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vision transition -->
+    <section class="vision-section" id="visionSection">
+      <div class="vision-divider"></div>
+      <p class="vision-text">
+        What if you could <span>focus entirely on your business model</span> — and have professional AI agents handle the execution, operations, and scaling for you?
+      </p>
+    </section>
+
   </main>
 
   <!-- Footer -->
@@ -660,6 +835,19 @@
           form.querySelector('.waitlist-btn').textContent = 'Join Waitlist';
         }, 3000);
       }
+    });
+
+    // ─── Scroll reveal ───
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.pain-section, .vision-section').forEach(el => {
+      observer.observe(el);
     });
 
     // ─── Randomize steam drift slightly ───
