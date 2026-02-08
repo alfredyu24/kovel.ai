@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kovel.ai — We're Cooking Agent</title>
+  <meta name="description" content="Kovel.ai is building the next generation of AI agents. Join the waitlist.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #060608;
+      --surface: #0c0c10;
+      --border: rgba(255, 255, 255, 0.06);
+      --text: #e8e6e1;
+      --text-dim: #6b6a67;
+      --accent: #f97316;
+      --accent-glow: rgba(249, 115, 22, 0.3);
+      --ember: #ef4444;
+      --gold: #fbbf24;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Animated mesh background ─── */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-mesh .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.4;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .bg-mesh .orb:nth-child(1) {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      top: -15%; left: -10%;
+      animation-delay: 0s;
+    }
+
+    .bg-mesh .orb:nth-child(2) {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--ember) 0%, transparent 70%);
+      bottom: -20%; right: -10%;
+      animation-delay: -7s;
+      animation-duration: 25s;
+    }
+
+    .bg-mesh .orb:nth-child(3) {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+      top: 40%; left: 50%;
+      opacity: 0.2;
+      animation-delay: -14s;
+      animation-duration: 30s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(60px, -40px) scale(1.1); }
+      50% { transform: translate(-30px, 50px) scale(0.95); }
+      75% { transform: translate(40px, 20px) scale(1.05); }
+    }
+
+    /* ─── Grain overlay ─── */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px;
+    }
+
+    /* ─── Layout ─── */
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* ─── Nav ─── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(20px);
+      background: rgba(6, 6, 8, 0.6);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.5rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-status {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--accent-glow); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 8px transparent; }
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      text-align: center;
+      max-width: 800px;
+      animation: fadeUp 1s ease-out both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Cauldron visual ─── */
+    .cauldron-wrap {
+      margin-bottom: 3rem;
+      display: flex;
+      justify-content: center;
+      animation: fadeUp 1s ease-out 0.15s both;
+    }
+
+    .cauldron {
+      position: relative;
+      width: 180px;
+      height: 180px;
+    }
+
+    .cauldron-body {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 90px;
+      background: linear-gradient(180deg, #1a1a20 0%, #111115 100%);
+      border-radius: 10px 10px 50px 50px;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-top-color: rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+
+    .cauldron-body::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(0deg, var(--accent) 0%, var(--ember) 50%, transparent 100%);
+      opacity: 0.3;
+      animation: brew 3s ease-in-out infinite;
+    }
+
+    @keyframes brew {
+      0%, 100% { opacity: 0.2; height: 40%; }
+      50% { opacity: 0.4; height: 55%; }
+    }
+
+    .cauldron-rim {
+      position: absolute;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 14px;
+      background: linear-gradient(180deg, #2a2a32, #1a1a20);
+      border-radius: 8px;
+      border: 1.5px solid rgba(255,255,255,0.1);
+    }
+
+    /* ─── Steam / particles ─── */
+    .steam-container {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+    }
+
+    .steam {
+      position: absolute;
+      bottom: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: rise 3s ease-out infinite;
+    }
+
+    .steam:nth-child(1) { left: 20%; animation-delay: 0s; background: var(--accent); }
+    .steam:nth-child(2) { left: 45%; animation-delay: 0.5s; background: var(--gold); width: 6px; height: 6px; }
+    .steam:nth-child(3) { left: 70%; animation-delay: 1s; background: var(--ember); }
+    .steam:nth-child(4) { left: 35%; animation-delay: 1.5s; background: var(--accent); width: 5px; height: 5px; }
+    .steam:nth-child(5) { left: 60%; animation-delay: 2s; background: var(--gold); width: 7px; height: 7px; }
+    .steam:nth-child(6) { left: 25%; animation-delay: 2.5s; background: var(--ember); width: 4px; height: 4px; }
+    .steam:nth-child(7) { left: 55%; animation-delay: 0.8s; background: var(--accent); width: 6px; height: 6px; }
+    .steam:nth-child(8) { left: 40%; animation-delay: 1.8s; background: var(--gold); width: 5px; height: 5px; }
+
+    @keyframes rise {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+      20% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) translateX(var(--drift, 10px)) scale(0.3);
+        filter: blur(4px);
+      }
+    }
+
+    .steam:nth-child(odd) { --drift: -15px; }
+    .steam:nth-child(even) { --drift: 12px; }
+    .steam:nth-child(3n) { --drift: -8px; }
+
+    /* ─── Glow under cauldron ─── */
+    .cauldron-glow {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 30px;
+      background: var(--accent);
+      border-radius: 50%;
+      filter: blur(25px);
+      opacity: 0.5;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.3; transform: translateX(-50%) scaleX(1); }
+      50% { opacity: 0.6; transform: translateX(-50%) scaleX(1.2); }
+    }
+
+    /* ─── Typography ─── */
+    .hero-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1s ease-out 0.3s both;
+    }
+
+    .hero-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1s ease-out 0.45s both;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+      position: relative;
+    }
+
+    .hero-title em::after {
+      content: '';
+      position: absolute;
+      bottom: 0.05em;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      opacity: 0.4;
+      border-radius: 2px;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      max-width: 500px;
+      margin: 0 auto 3rem;
+      animation: fadeUp 1s ease-out 0.6s both;
+    }
+
+    /* ─── Waitlist form ─── */
+    .waitlist {
+      animation: fadeUp 1s ease-out 0.75s both;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .waitlist-form {
+      display: flex;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .waitlist-form:focus-within {
+      border-color: rgba(249, 115, 22, 0.3);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08), 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .waitlist-input {
+      flex: 1;
+      padding: 1rem 1.25rem;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+    }
+
+    .waitlist-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .waitlist-btn {
+      padding: 1rem 1.75rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .waitlist-btn:hover {
+      background: #ea6c10;
+    }
+
+    .waitlist-btn:active {
+      transform: scale(0.97);
+    }
+
+    .waitlist-msg {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-top: 0.75rem;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .waitlist-msg.visible {
+      opacity: 1;
+    }
+
+    .waitlist-note {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 1rem;
+      text-align: center;
+      letter-spacing: 0.05em;
+      animation: fadeUp 1s ease-out 0.9s both;
+    }
+
+    /* ─── Floating tags ─── */
+    .tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 3.5rem;
+      animation: fadeUp 1s ease-out 1.05s both;
+    }
+
+    .tag {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.02);
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .tag:hover {
+      border-color: rgba(249, 115, 22, 0.3);
+      color: var(--text);
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(20px);
+      background: rgba(6, 6, 8, 0.4);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover {
+      color: var(--text);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .nav { padding: 1rem 1.25rem; }
+      .nav-status { display: none; }
+      .page { padding: 1.5rem; }
+
+      .cauldron { width: 140px; height: 140px; }
+      .cauldron-body { width: 95px; height: 72px; }
+      .cauldron-rim { width: 110px; height: 12px; bottom: 68px; }
+      .steam-container { height: 70px; }
+      .cauldron-wrap { margin-bottom: 2rem; }
+
+      .hero-sub { font-size: 1rem; }
+
+      .waitlist-form {
+        flex-direction: column;
+        border-radius: 14px;
+      }
+
+      .waitlist-btn {
+        border-radius: 0 0 12px 12px;
+        padding: 0.9rem;
+      }
+
+      .tags { margin-top: 2.5rem; }
+
+      .footer {
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+        padding: 0.75rem 1.25rem;
+      }
+    }
+
+    /* ─── Cursor trail (desktop only) ─── */
+    .cursor-dot {
+      position: fixed;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s;
+      mix-blend-mode: screen;
+    }
+
+    body:hover .cursor-dot { opacity: 0.6; }
+
+    @media (max-width: 768px) {
+      .cursor-dot { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient background -->
+  <div class="bg-mesh">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div class="grain"></div>
+
+  <!-- Cursor trail -->
+  <div class="cursor-dot" id="cursor"></div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">Kovel<span>.</span>ai</a>
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      Building in stealth
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="page">
+    <div class="hero">
+
+      <!-- Cauldron illustration -->
+      <div class="cauldron-wrap">
+        <div class="cauldron">
+          <div class="steam-container">
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+          </div>
+          <div class="cauldron-rim"></div>
+          <div class="cauldron-body"></div>
+          <div class="cauldron-glow"></div>
+        </div>
+      </div>
+
+      <p class="hero-label">AI Agent Framework</p>
+
+      <h1 class="hero-title">
+        We're cooking<br><em>agent</em>
+      </h1>
+
+      <p class="hero-sub">
+        Something powerful is brewing. Kovel.ai is building the next generation of autonomous AI agents. Be the first to know.
+      </p>
+
+      <!-- Waitlist -->
+      <div class="waitlist">
+        <form class="waitlist-form" id="waitlistForm">
+          <input
+            type="email"
+            class="waitlist-input"
+            placeholder="you@company.com"
+            required
+            autocomplete="email"
+            aria-label="Email address"
+          >
+          <button type="submit" class="waitlist-btn">Join Waitlist</button>
+        </form>
+        <p class="waitlist-msg" id="waitlistMsg"></p>
+        <p class="waitlist-note">No spam. Only major updates.</p>
+      </div>
+
+      <!-- Tags -->
+      <div class="tags">
+        <span class="tag">Autonomous</span>
+        <span class="tag">Multi-Agent</span>
+        <span class="tag">Tool Use</span>
+        <span class="tag">Reasoning</span>
+        <span class="tag">Memory</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>&copy; 2026 Kovel.ai</span>
+    <a href="mailto:hello@kovel.ai">hello@kovel.ai</a>
+  </footer>
+
+  <script>
+    // ─── Cursor follow ───
+    const cursor = document.getElementById('cursor');
+    let cx = 0, cy = 0, dx = 0, dy = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      dx = e.clientX;
+      dy = e.clientY;
+    });
+
+    function animateCursor() {
+      cx += (dx - cx) * 0.15;
+      cy += (dy - cy) * 0.15;
+      cursor.style.left = cx - 3 + 'px';
+      cursor.style.top = cy - 3 + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // ─── Waitlist form ───
+    const form = document.getElementById('waitlistForm');
+    const msg = document.getElementById('waitlistMsg');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = form.querySelector('input').value;
+      if (email) {
+        msg.textContent = "You're on the list. We'll be in touch.";
+        msg.classList.add('visible');
+        form.querySelector('input').value = '';
+        form.querySelector('.waitlist-btn').textContent = 'Joined!';
+        setTimeout(() => {
+          form.querySelector('.waitlist-btn').textContent = 'Join Waitlist';
+        }, 3000);
+      }
+    });
+
+    // ─── Randomize steam drift slightly ───
+    document.querySelectorAll('.steam').forEach((el) => {
+      const drift = (Math.random() - 0.5) * 30;
+      el.style.setProperty('--drift', drift + 'px');
+      el.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+    });
+  </script>
+
+</body>
+</html>
