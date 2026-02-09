@@ -8,6 +8,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js/+esm",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+      "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.7/modules/talkinghead.mjs"
+    }
+  }
+  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -175,128 +184,119 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── Cauldron visual ─── */
-    .cauldron-wrap {
-      margin-bottom: 3rem;
-      display: flex;
-      justify-content: center;
+    /* ─── 3D Avatar (fixed floating widget) ─── */
+    .avatar-wrap {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 50;
       animation: fadeUp 1s ease-out 0.15s both;
+      touch-action: none;
     }
 
-    .cauldron {
+    .avatar-wrap.dragging {
+      cursor: grabbing;
+      user-select: none;
+    }
+
+    .avatar-container {
       position: relative;
-      width: 180px;
-      height: 180px;
+      width: 200px;
+      height: 200px;
+      cursor: grab;
     }
 
-    .cauldron-body {
+    .avatar-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    .avatar-glow {
       position: absolute;
-      bottom: 0;
+      bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
+      width: 100px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      filter: blur(20px);
+      opacity: 0.45;
+      animation: avatarGlowPulse 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes avatarGlowPulse {
+      0%, 100% { opacity: 0.3; transform: translateX(-50%) scaleX(1); }
+      50% { opacity: 0.55; transform: translateX(-50%) scaleX(1.15); }
+    }
+
+    /* ─── Avatar loader ─── */
+    .avatar-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      transition: opacity 0.5s ease-out;
+      z-index: 2;
+    }
+
+    .avatar-loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .avatar-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar-loader-text {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+    }
+
+    .avatar-progress {
       width: 120px;
-      height: 90px;
-      background: linear-gradient(180deg, #1a1a20 0%, #111115 100%);
-      border-radius: 10px 10px 50px 50px;
-      border: 1.5px solid rgba(255,255,255,0.08);
-      border-top-color: rgba(255,255,255,0.12);
+      height: 3px;
+      background: var(--border);
+      border-radius: 3px;
       overflow: hidden;
     }
 
-    .cauldron-body::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 50%;
-      background: linear-gradient(0deg, var(--accent) 0%, var(--ember) 50%, transparent 100%);
-      opacity: 0.3;
-      animation: brew 3s ease-in-out infinite;
-    }
-
-    @keyframes brew {
-      0%, 100% { opacity: 0.2; height: 40%; }
-      50% { opacity: 0.4; height: 55%; }
-    }
-
-    .cauldron-rim {
-      position: absolute;
-      bottom: 85px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 140px;
-      height: 14px;
-      background: linear-gradient(180deg, #2a2a32, #1a1a20);
-      border-radius: 8px;
-      border: 1.5px solid rgba(255,255,255,0.1);
-    }
-
-    /* ─── Steam / particles ─── */
-    .steam-container {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 100px;
-    }
-
-    .steam {
-      position: absolute;
-      bottom: 0;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      opacity: 0;
-      animation: rise 3s ease-out infinite;
-    }
-
-    .steam:nth-child(1) { left: 20%; animation-delay: 0s; background: var(--accent); }
-    .steam:nth-child(2) { left: 45%; animation-delay: 0.5s; background: var(--gold); width: 6px; height: 6px; }
-    .steam:nth-child(3) { left: 70%; animation-delay: 1s; background: var(--ember); }
-    .steam:nth-child(4) { left: 35%; animation-delay: 1.5s; background: var(--accent); width: 5px; height: 5px; }
-    .steam:nth-child(5) { left: 60%; animation-delay: 2s; background: var(--gold); width: 7px; height: 7px; }
-    .steam:nth-child(6) { left: 25%; animation-delay: 2.5s; background: var(--ember); width: 4px; height: 4px; }
-    .steam:nth-child(7) { left: 55%; animation-delay: 0.8s; background: var(--accent); width: 6px; height: 6px; }
-    .steam:nth-child(8) { left: 40%; animation-delay: 1.8s; background: var(--gold); width: 5px; height: 5px; }
-
-    @keyframes rise {
-      0% {
-        opacity: 0;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-      20% {
-        opacity: 0.8;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-100px) translateX(var(--drift, 10px)) scale(0.3);
-        filter: blur(4px);
-      }
-    }
-
-    .steam:nth-child(odd) { --drift: -15px; }
-    .steam:nth-child(even) { --drift: 12px; }
-    .steam:nth-child(3n) { --drift: -8px; }
-
-    /* ─── Glow under cauldron ─── */
-    .cauldron-glow {
-      position: absolute;
-      bottom: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 30px;
+    .avatar-progress-bar {
+      height: 100%;
+      width: 0%;
       background: var(--accent);
-      border-radius: 50%;
-      filter: blur(25px);
-      opacity: 0.5;
-      animation: glowPulse 3s ease-in-out infinite;
+      border-radius: 3px;
+      transition: width 0.2s ease-out;
     }
 
-    @keyframes glowPulse {
-      0%, 100% { opacity: 0.3; transform: translateX(-50%) scaleX(1); }
-      50% { opacity: 0.6; transform: translateX(-50%) scaleX(1.2); }
+    .avatar-error {
+      display: none;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .avatar-error.visible {
+      display: block;
     }
 
     /* ─── Typography ─── */
@@ -626,11 +626,8 @@
       .nav-status { display: none; }
       .page { padding: 1.5rem; }
 
-      .cauldron { width: 140px; height: 140px; }
-      .cauldron-body { width: 95px; height: 72px; }
-      .cauldron-rim { width: 110px; height: 12px; bottom: 68px; }
-      .steam-container { height: 70px; }
-      .cauldron-wrap { margin-bottom: 2rem; }
+      .avatar-wrap { bottom: 1rem; right: 1rem; }
+      .avatar-container { width: 150px; height: 150px; }
 
       .hero-sub { font-size: 1rem; }
 
@@ -697,29 +694,25 @@
     </div>
   </nav>
 
+  <!-- 3D Avatar (fixed floating widget) -->
+  <div class="avatar-wrap" id="avatarWrap">
+    <div class="avatar-container" id="avatarContainer">
+      <div class="avatar-loader" id="avatarLoader">
+        <div class="avatar-spinner"></div>
+        <span class="avatar-loader-text">Loading avatar…</span>
+        <div class="avatar-progress">
+          <div class="avatar-progress-bar" id="avatarProgress"></div>
+        </div>
+      </div>
+      <div class="avatar-error" id="avatarError">Avatar unavailable</div>
+      <div class="avatar-glow"></div>
+    </div>
+  </div>
+
   <!-- Main -->
   <main class="page">
     <div class="page-hero">
     <div class="hero">
-
-      <!-- Cauldron illustration -->
-      <div class="cauldron-wrap">
-        <div class="cauldron">
-          <div class="steam-container">
-            <div class="steam"></div>
-            <div class="steam"></div>
-            <div class="steam"></div>
-            <div class="steam"></div>
-            <div class="steam"></div>
-            <div class="steam"></div>
-            <div class="steam"></div>
-            <div class="steam"></div>
-          </div>
-          <div class="cauldron-rim"></div>
-          <div class="cauldron-body"></div>
-          <div class="cauldron-glow"></div>
-        </div>
-      </div>
 
       <p class="hero-label">AI Agent for Business</p>
 
@@ -850,12 +843,116 @@
       observer.observe(el);
     });
 
-    // ─── Randomize steam drift slightly ───
-    document.querySelectorAll('.steam').forEach((el) => {
-      const drift = (Math.random() - 0.5) * 30;
-      el.style.setProperty('--drift', drift + 'px');
-      el.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
-    });
+    // ─── Draggable avatar ───
+    (function() {
+      const wrap = document.getElementById('avatarWrap');
+      let dragging = false, startX, startY, origX, origY;
+
+      function onDown(e) {
+        const ev = e.touches ? e.touches[0] : e;
+        dragging = true;
+        wrap.classList.add('dragging');
+        const rect = wrap.getBoundingClientRect();
+        origX = rect.left;
+        origY = rect.top;
+        startX = ev.clientX;
+        startY = ev.clientY;
+        e.preventDefault();
+      }
+
+      function onMove(e) {
+        if (!dragging) return;
+        const ev = e.touches ? e.touches[0] : e;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        let newX = origX + dx;
+        let newY = origY + dy;
+        // clamp to viewport
+        const w = wrap.offsetWidth, h = wrap.offsetHeight;
+        newX = Math.max(0, Math.min(window.innerWidth - w, newX));
+        newY = Math.max(0, Math.min(window.innerHeight - h, newY));
+        wrap.style.left = newX + 'px';
+        wrap.style.top = newY + 'px';
+        wrap.style.right = 'auto';
+        wrap.style.bottom = 'auto';
+        e.preventDefault();
+      }
+
+      function onUp() {
+        if (!dragging) return;
+        dragging = false;
+        wrap.classList.remove('dragging');
+      }
+
+      wrap.addEventListener('mousedown', onDown);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+      wrap.addEventListener('touchstart', onDown, { passive: false });
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onUp);
+    })();
+
+  </script>
+
+  <script type="module">
+    import { TalkingHead } from 'talkinghead';
+
+    const container = document.getElementById('avatarContainer');
+    const loader    = document.getElementById('avatarLoader');
+    const progress  = document.getElementById('avatarProgress');
+    const errorEl   = document.getElementById('avatarError');
+
+    function showError() {
+      loader.classList.add('hidden');
+      errorEl.classList.add('visible');
+    }
+
+    (async () => {
+      try {
+        const head = new TalkingHead(container, {
+          ttsEndpoint: null,
+          cameraView: 'upper',
+          cameraDistance: 0.4,
+          cameraX: 0,
+          cameraY: 0,
+          cameraRotateEnable: false,
+          cameraPanEnable: false,
+          cameraZoomEnable: false,
+          bgColor: null,
+        });
+
+        await head.showAvatar(
+          {
+            url: './avatars/avaturn.glb',
+            body: 'F',
+            avatarMood: 'happy',
+            lipsyncLang: 'en',
+          },
+          (ev) => {
+            if (ev.lengthComputable) {
+              const pct = Math.round((ev.loaded / ev.total) * 100);
+              progress.style.width = pct + '%';
+            }
+          }
+        );
+
+        loader.classList.add('hidden');
+
+        head.setMood('happy');
+        head.lookAtCamera(500);
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            head.stop();
+          } else {
+            head.start();
+          }
+        });
+      } catch (err) {
+        console.error('Avatar failed to load:', err);
+        showError();
+      }
+    })();
   </script>
 
 </body>
